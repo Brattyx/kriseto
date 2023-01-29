@@ -317,10 +317,13 @@
 					for (i=0; i < a.length; i++) {
 	
 						// Load.
-							a[i].src = a[i].dataset.src;
+							a[i].contentWindow.location.replace(a[i].dataset.src);
+	
+						// Save initial src.
+							a[i].dataset.initialSrc = a[i].dataset.src;
 	
 						// Mark as loaded.
-							a[i].dataset.src = "";
+							a[i].dataset.src = '';
 	
 					}
 	
@@ -382,10 +385,17 @@
 								continue;
 	
 						// Mark as unloaded.
-							a[i].dataset.src = a[i].src;
+	
+							// IFRAME was previously loaded by loadElements()? Use initialSrc.
+								if ('initialSrc' in a[i].dataset)
+									a[i].dataset.src = a[i].dataset.initialSrc;
+	
+							// Otherwise, just use src.
+								else
+									a[i].dataset.src = a[i].src;
 	
 						// Unload.
-							a[i].src = '';
+							a[i].contentWindow.location.replace('about:blank');
 	
 					}
 	
@@ -445,8 +455,8 @@
 						// Lsd units available?
 							if (client.flags.lsdUnits) {
 	
-								document.documentElement.style.setProperty('--viewport-height', '100dvh');
-								document.documentElement.style.setProperty('--background-height', '100lvh');
+								document.documentElement.style.setProperty('--viewport-height', '100svh');
+								document.documentElement.style.setProperty('--background-height', '100dvh');
 	
 							}
 	
@@ -459,7 +469,6 @@
 								};
 	
 								on('load', f);
-								on('resize', f);
 								on('orientationchange', function() {
 	
 									// Update after brief delay.
